@@ -8,7 +8,7 @@ function webhook(dependencies) {
 
 	const subscribe = function (req, res) {
 		if (req.params.ip) {
-			subscribers.push({ ip: req.params.ip });
+			subscribers.push({ ip: _token.encryptWithPrivateSign(req.params.ip) });
 			_console.success('Server', `${req.params.ip} is subscribed succesfuly`);
 			res.json({ success: true, message: 'IP subscribed succesfuly', data: null });
 		}
@@ -24,7 +24,7 @@ function webhook(dependencies) {
 			for (let i = 0; i < subscribers.length; i++) {
 				const subscriber = subscribers[i];
 
-				request.post(`http://${subscriber.ip}/webhook/${req.params.message}`, {
+				request.post(`http://${_token.decryptDataWithPrivateSign(subscriber.ip)}/webhook/${req.params.message}`, {
 					form: {
 						message: _token.encryptWithPrivateSign(req.params.message)
 					}
@@ -51,9 +51,14 @@ function webhook(dependencies) {
 		}
 	}
 
+	const getSubscribers = function (req, res) {
+		res.json({ success: true, message: 'Subscribers', data: subscribers });
+	}
+
 	return {
 		subscribe: subscribe,
 		postAction: postAction,
+		getSubscribers: getSubscribers,
 	}
 }
 

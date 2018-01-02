@@ -187,6 +187,14 @@ function token(dependencies) {
 		return encryptedHex;
 	}
 
+	const decryptDataWithPrivateSign = function (input) {
+		var encryptedBytes = aesjs.utils.hex.toBytes(input);
+		var aesOfb = new aesjs.ModeOfOperation.ofb(privateKeyPair.key.split(':').map((value) => { return +value }), privateKeyPair.iv.split(':').map((value) => { return +value }));
+		var decryptedBytes = aesOfb.decrypt(encryptedBytes);
+		var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+		return decryptedText;
+	}
+
 	const isAllowed = function (req, res) {
 		res.json({ result: encryptWithPrivateSign(JSON.stringify({ success: true, message: 'You are allowed to use this webhook', result: true })) });
 	}
@@ -201,7 +209,8 @@ function token(dependencies) {
 		getUnsignedPrivateKeyPair: getUnsignedPrivateKeyPair,
 		refresh: refresh,
 		isAllowed: isAllowed,
-		encryptWithPrivateSign: encryptWithPrivateSign
+		encryptWithPrivateSign: encryptWithPrivateSign,
+		decryptDataWithPrivateSign: decryptDataWithPrivateSign
 	};
 }
 

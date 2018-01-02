@@ -36,6 +36,7 @@ function API(dependencies) {
 		/// Webhook definition
 		_apiRoutes.get('/webhook/subscribe/:ip', _webhook.subscribe);
 		_apiRoutes.get('/webhook/post/:message', _webhook.postAction);
+		_apiRoutes.get('/webhook/getSubscribers', _webhook.getSubscribers);
 
 		// apply the routes to our application with the prefix /api
 		_app.use('/api', _apiRoutes);
