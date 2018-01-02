@@ -5,18 +5,6 @@ function token(dependencies) {
 	const aesjs = dependencies.aesjs;
 	const _console = dependencies.console;
 
-	/**
-	 * Status
-	 *
-	 * route to show message (GET http://<<URL>>/api/Status)
-	 */
-	const get = function (req, res) {
-		res.json({
-			success: true,
-			message: "API is online"
-		});
-	};
-
 	const getPublicKeyPair = function (req, res) {
 		if (publicKeyPair) {
 			res.json({
@@ -34,6 +22,40 @@ function token(dependencies) {
 		}
 	}
 
+	const getSignedPrivateKeyPair = function (req, res) {
+		if (signedPrivateKeyPair) {
+			res.json({
+				success: true,
+				data: signedPrivateKeyPair,
+				message: 'Signed Private Key Pair'
+			})
+		}
+		else {
+			res.json({
+				success: false,
+				data: null,
+				message: 'Something was wrong while getting public data'
+			})
+		}
+	}
+
+	const getUnsignedPrivateKeyPair = function () {
+		if (unsignedPrivateKeyPair) {
+			return {
+				success: true,
+				data: unsignedPrivateKeyPair,
+				message: 'Unsigned Private Key Pair'
+			}
+		}
+		else {
+			return {
+				success: false,
+				data: null,
+				message: 'Something was wrong while getting public data'
+			};
+		}
+	}
+
 	const refresh = (req, res) => {
 		let imageName = Math.floor((Math.random() * 5) + 1) + '';
 
@@ -45,7 +67,6 @@ function token(dependencies) {
 						var token = data.result.replace("[OUTPUT]", json.data.link);
 
 						token = obfuscation(token);
-						_console.success('Token generation', token);
 
 						token = encrypt(token);
 						_console.success('Token generation', token);
@@ -78,6 +99,8 @@ function token(dependencies) {
 		var result = ``;
 		var hasError = false;
 		var token = tokenGenerator();
+		privateKeyPair = token;
+
 		var child = spawn("powershell.exe", [
 			`Import-Module ${dependencies.root}/lib/tokenization/Invoke-PSImage.ps1; Invoke-PSImage`,
 			`-Script "${(scriptTemplate.replace('my:key', token.key)).replace('my:iv', token.iv)}" -Image ${dependencies.root}/lib/tokenization/images/${source}.jpg -Out ${dependencies.root}/lib/tokenization/images/output/${destination}.png -Web`
@@ -186,10 +209,13 @@ function token(dependencies) {
 	}
 
 	const publicKeyPair = tokenGenerator();
+	var unsignedPrivateKeyPair = {};
+	var signedPrivateKeyPair = {};
 
 	return {
-		get: get,
 		getPublicKeyPair: getPublicKeyPair,
+		getSignedPrivateKeyPair: getSignedPrivateKeyPair,
+		getUnsignedPrivateKeyPair: getUnsignedPrivateKeyPair,
 		refresh: refresh
 	};
 }
