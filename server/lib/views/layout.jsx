@@ -1,17 +1,13 @@
 const React = require('react');
 const PropTypes = require('prop-types');
 
-function getCurrentYear(): string {
-	return (new Date).getFullYear();
-}
-
 class Layout extends React.Component {
 	render() {
 		return (
 			<html lang="en">
 
 				<head>
-					<title>Boilerplate {this.props.title !== undefined ? ' - ' + this.props.title : ''}</title>
+					<title>Webhooks {this.props.title !== undefined ? ' - ' + this.props.title : ''}</title>
 					<meta charSet="utf-8" />
 					<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 					<meta name="keywords" content="some, words, about, this, project" />
