@@ -1,0 +1,6 @@
+{
+    "MainSecretJWT": "NodeJSIsCool",
+    "ServerPort": "3500",
+    "ServerVersion": "0.0.1",
+    "ServerName": "WebHook API Server"
+}

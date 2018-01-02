@@ -1,0 +1,42 @@
+{
+	"name": "webhook-poc",
+	"title": "Webhook Proof of Concept",
+	"description": "This is a Node.js server to provide webhooks",
+	"version": "0.1.0",
+	"homepage": "https://reversebytes.wordpress.com",
+	"author": "Camilo Rodriguez <camiepisode@outlook.com>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Main/Main.Main.git"
+	},
+	"keywords": [
+		"Main",
+		"boilerplate",
+		"template",
+		"lite",
+		"tool"
+	],
+	"bugs": {
+		"url": "https://github.com/thEpisode/WebHook-PoC/issues"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"body-parser": "latest",
+		"colors": "latest",
+		"config": "^1.20.4",
+		"ejs": "latest",
+		"express": "latest",
+		"express-react-views": "^0.10.4",
+		"jsonwebtoken": "latest",
+		"react": "^16.0.0",
+		"react-dom": "^16.0.0"
+	},
+	"engine": {
+		"node": "6.11.4 || 8.6.x"
+	},
+	"scripts": {
+		"start": "node app.js",
+		"install-bower": "npm install -g bower",
+		"setup-frontend": "cd public/ && bower install && cd .."
+	}
+}
