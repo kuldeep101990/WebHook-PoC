@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# generated images
+server/lib/tokenization/images/output/*.png
