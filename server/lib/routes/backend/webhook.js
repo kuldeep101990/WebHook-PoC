@@ -2,6 +2,7 @@ function webhook(dependencies) {
 	const _console = dependencies.console;
 	const cross = dependencies.cross;
 	const request = dependencies.request;
+	const _token = dependencies.token
 
 	var subscribers = [];
 
@@ -25,7 +26,7 @@ function webhook(dependencies) {
 
 				request.post(`http://${subscriber.ip}/webhook/${req.params.message}`, {
 					form: {
-						message: req.params.message
+						message: _token.encryptWithPrivateSign(req.params.message)
 					}
 				},
 					function (error, response, body) {

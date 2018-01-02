@@ -180,7 +180,6 @@ function token(dependencies) {
 	}
 
 	const encryptWithPrivateSign = function (input) {
-		console.log('privateKeyPair', privateKeyPair);
 		var textBytes = aesjs.utils.utf8.toBytes(input);
 		var aesOfb = new aesjs.ModeOfOperation.ofb(privateKeyPair.key.split(':').map((value) => { return +value }), privateKeyPair.iv.split(':').map((value) => { return +value }));
 		var encryptedBytes = aesOfb.encrypt(textBytes);
@@ -202,6 +201,7 @@ function token(dependencies) {
 		getUnsignedPrivateKeyPair: getUnsignedPrivateKeyPair,
 		refresh: refresh,
 		isAllowed: isAllowed,
+		encryptWithPrivateSign: encryptWithPrivateSign
 	};
 }
 

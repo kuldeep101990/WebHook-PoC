@@ -2,7 +2,7 @@ function API(dependencies) {
 	
 	const _status = require(`${dependencies.root}/lib/routes/backend/status`)(dependencies);
 	const _token = require(`${dependencies.root}/lib/routes/backend/token`)(dependencies);
-	const _webhook = require(`${dependencies.root}/lib/routes/backend/webhook`)(dependencies);
+	var _webhook = undefined;
 
 	/// Dependencies
 	const _console = dependencies.console;
@@ -13,6 +13,9 @@ function API(dependencies) {
 	var _apiRoutes;
 
 	const constructor = () => {
+		dependencies.token = _token;
+		_webhook = require(`${dependencies.root}/lib/routes/backend/webhook`)(dependencies);
+		
 		_apiRoutes = _express.Router();
 
 		createAPI();

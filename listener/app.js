@@ -24,7 +24,7 @@ console.log(` Server:  ${config.ServerName}`);
 console.log(` version: ${config.ServerVersion}`);
 console.log(" ------------------------------------");
 
-console.log(colors.green(" Listener: ") + "Libs imported");
+console.log(colors.cyan(" Listener: ") + "Libs imported");
 
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -63,14 +63,14 @@ const normalizePort = (val) => {
 function getPublicKeyFromService(next) {
 	request(`${config.apiServerURI}/token/public`, function (error, response, data) {
 		if (error) {
-			console.log('Unhandled error');
+			console.log(colors.red(" API Server: ") + 'Unhandled error');
 		}
 		else {
 			if (response && response.statusCode == 200) {
 				data = JSON.parse(data);
 				if (data && data.success) {
 					if (data.success === true) {
-						console.log(colors.green(" API Server: ") + `Public key ${JSON.stringify(data.result)}`);
+						console.log(colors.cyan(" API Server: ") + `Public key ${JSON.stringify(data.result)}`);
 						next(data.result);
 					}
 					else {
@@ -94,14 +94,14 @@ function getPublicKeyFromService(next) {
 function getPrivateKeyFromService(next) {
 	request(`${config.apiServerURI}/token/private`, function (error, response, data) {
 		if (error) {
-			console.log('Unhandled error');
+			console.log(colors.red(" API Server: ") + 'Unhandled error');
 		}
 		else {
 			if (response && response.statusCode == 200) {
 				data = JSON.parse(data);
 				if (data && data.success) {
 					if (data.success === true) {
-						console.log(colors.green(" API Server: ") + `Private key ${JSON.stringify(data.result)}`);
+						console.log(colors.cyan(" API Server: ") + `Private key ${JSON.stringify(data.result)}`);
 						next(data.result);
 					}
 					else {
@@ -208,7 +208,7 @@ const isAllowedToSubscribe = function (next) {
 			if (response && response.statusCode == 200) {
 				data = JSON.parse(data);
 				if (data) {
-					console.log(colors.green(" API Server: ") + `${data.result}`);
+					console.log(colors.cyan(" API Server: ") + `${data.result}`);
 					next(data.result);
 				}
 				else {
@@ -225,6 +225,7 @@ const isAllowedToSubscribe = function (next) {
 }
 
 function subscribeListener(next) {
+	isAllowed = JSON.parse(isAllowed);
 	if (isAllowed.success) {
 		if (isAllowed.success === true && isAllowed.result === true) {
 			request(`${config.apiServerURI}/webhook/subscribe/${config.listenerURI}`, function (error, response, data) {
@@ -236,7 +237,6 @@ function subscribeListener(next) {
 						data = JSON.parse(data);
 						if (data && data.success) {
 							if (data.success === true) {
-								console.log(colors.green(" API Server: ") + 'Ip subscribed succesfuly and ready for incoming webhooks');
 								next(data);
 							}
 							else {
@@ -257,11 +257,11 @@ function subscribeListener(next) {
 			});
 		}
 		else {
-			console.log('You cannot subscribe this node to webhook');
+			console.log('You cannot subscribe this node to webhook 1');
 		}
 	}
 	else {
-		console.log('You cannot subscribe this node to webhook');
+		console.log('You cannot subscribe this node to webhook 2');
 	}
 
 }
@@ -279,29 +279,30 @@ function main() {
 					obfuscateData = decryptDataWithPublicKey(privateKey);
 					deobfuscateData = deobfuscation(obfuscateData);
 
+					
+					console.log(colors.cyan(" Private key decrypted but obfuscated data: "), obfuscateData);
+					console.log(colors.cyan(" Private key decrypted and deobfuscated data: "), deobfuscateData);
+
 					claimPrivateKey(deobfuscateData, function (claimPrivateKeyData) {
 						privateKeyDeobfuscatePlainText = claimPrivateKeyData;
 						if (privateKeyDeobfuscatePlainText.hasError == false) {
 							privateKeyDeobfuscate = digestPlainTextPrivateKey(privateKeyDeobfuscatePlainText.result);
+							
+							console.log(colors.cyan(" Private key in plain text: "), privateKeyDeobfuscatePlainText);
+							console.log(colors.cyan(" Private key digested and ready for use: "), privateKeyDeobfuscate);
 
 							isAllowedToSubscribe(function (isAllowedToSubscribeData) {
+								console.log(colors.cyan(" Can I connect? encrypted: "), isAllowedToSubscribeData);
 								isAllowed = decryptDataWithPrivateKey(isAllowedToSubscribeData);
+								console.log(colors.cyan(" Can I connect? decrypted: "), isAllowed);
 
-								console.log('isAllowed: ', isAllowed);
+								subscribeListener(function(subscribeListenerData){
+									console.log(colors.cyan(" API Server Webhook subscription: "), subscribeListenerData);
+								})
+
 							});
-
-
-
-							console.log('privateKeyDeobfuscatePlainText:', privateKeyDeobfuscatePlainText.result);
-							console.log('privateKeyDeobfuscate:', privateKeyDeobfuscate);
 						}
-
-					})
-
-					console.log('public key:', publicKey);
-					console.log('private key:', privateKey);
-					console.log('obfuscate data:', obfuscateData);
-					console.log('deobfuscate data:', deobfuscateData);
+					});
 				}
 			})
 		}
@@ -309,15 +310,36 @@ function main() {
 
 }
 
-
 app.post('/webhook/:message', function (req, res) {
-	console.log(colors.green(" API Server Webhook: ") + req.body.message);
+	console.log(colors.cyan(" Listener encrypted message: "), req.body.message);
+	
+	var decrypted = decryptDataWithPrivateKey(req.body.message);
+	console.log(colors.cyan(" Listener decrypted message: "), decrypted);
+	switch (decrypted) {
+		case 'Hello':
+			console.log(colors.green(" API Server Trusted Webhook message or command: ") + 'World');
+			break;
+		default:
+			console.log(colors.red(" API Server Untrusted Webhook: ") + req.body.message);
+			console.log(colors.yellow(" Warning, this is a malicius message or command, the system do not trust in this message. Closing Wallet..."));
+			process.exit();
+			break;
+	}
+
 	res.json({ success: true, message: 'Posted message succesfuly', data: null });
 });
 
 app.get('/status', function (req, res) {
 	res.json({ success: true, message: 'Is running', data: null });
 });
+
+app.get('/changeKeys', function (req, res) {
+	privateKeyDeobfuscate = {
+		key: '107:101:121:45:55:119:104:56:115:99:51:98:52:48:100:55',
+		iv: '107:101:121:105:118:45:116:118:97:105:97:118:99:99:103:50'
+	}
+	res.json({ success: true, message: 'Keys changed', data: null });
+})
 
 /**
  * Listening on port
