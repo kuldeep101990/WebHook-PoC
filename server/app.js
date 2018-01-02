@@ -17,6 +17,7 @@ const colors = require("colors/safe");
 const config = require("config");
 const spawn = require("child_process").spawn;
 const imgur = require("imgur");
+const aesjs = require('aes-js');
 
 console.log(` Server:  ${config.ServerName}`);
 console.log(` version: ${config.ServerVersion}`);
@@ -48,7 +49,8 @@ var dependencies = {
     return true;
   },
   spawn: spawn,
-  imgur: imgur
+  imgur: imgur,
+  aesjs: aesjs,
 };
 
 console.log(dependencies.colors.green(" Server: ") + "Libs imported");

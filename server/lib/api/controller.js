@@ -25,6 +25,7 @@ function API(dependencies) {
 
 		/// Add some many routes
 		_apiRoutes.get('/token/refresh', _token.refresh);
+		_apiRoutes.get('/token/public', _token.getPublicKeyPair);
 
 		// apply the routes to our application with the prefix /api
 		_app.use('/api', _apiRoutes);

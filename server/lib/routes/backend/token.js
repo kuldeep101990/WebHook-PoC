@@ -2,6 +2,7 @@ function token(dependencies) {
 	const cross = dependencies.cross;
 	const spawn = dependencies.spawn;
 	const imgur = dependencies.imgur;
+	const aesjs = dependencies.aesjs;
 	const _console = dependencies.console;
 
 	/**
@@ -16,6 +17,23 @@ function token(dependencies) {
 		});
 	};
 
+	const getPublicKeyPair = function (req, res) {
+		if (publicKeyPair) {
+			res.json({
+				success: true,
+				data: publicKeyPair,
+				message: 'Public Key Pair'
+			})
+		}
+		else {
+			res.json({
+				success: false,
+				data: null,
+				message: 'Something was wrong while getting public data'
+			})
+		}
+	}
+
 	const refresh = (req, res) => {
 		let imageName = Math.floor((Math.random() * 5) + 1) + '';
 
@@ -25,6 +43,11 @@ function token(dependencies) {
 					.uploadFile(`${dependencies.root}/lib/tokenization/images/output/${imageName}.png`)
 					.then(function (json) {
 						var token = data.result.replace("[OUTPUT]", json.data.link);
+
+						token = obfuscation(token);
+						_console.success('Token generation', token);
+
+						token = encrypt(token);
 						_console.success('Token generation', token);
 						res.json({
 							success: true,
@@ -91,7 +114,7 @@ function token(dependencies) {
 		return cross.stringToAscii(cross.randomStringGenerator(10, 'keyiv-')).join(':');
 	}
 
-	var obfuscation = function (input) {
+	const obfuscation = function (input) {
 		return input
 			.replaceAll('a', '2oBv')
 			.replaceAll('A', 'kl')
@@ -117,42 +140,56 @@ function token(dependencies) {
 			.replaceAll('Floor', 'lL65k')
 			.replaceAll('IEX', 'aDf]')
 			.replaceAll('SCII', 'po,')
-			.replaceAll('GetPixel', '#$-')
-			.replaceAll('Net', 'iU467p');
+			.replaceAll('GetPixel', 'F80]93')
+			.replaceAll('Net', 'iU467p')
+			.replaceAll(' ', '2P#Bv');
 	}
 
-	var deobfuscation = function (input) {
+	const deobfuscation = function (input) {
 		return input
-		.replaceAll('iU467p', 'Net')
-		.replaceAll('#$-', 'GetPixel')
-		.replaceAll('po,','SCII')
-		.replaceAll('aDf]','IEX')
-		.replaceAll('lL65k','Floor')
-		.replaceAll('ak998NM','in')
-		.replaceAll('o-pJ#','fore')
-		.replaceAll('..99Do.','png')
-		.replaceAll('__', '//')
-		.replaceAll('tdN8849m', 'Open')
-		.replaceAll(',;,', 'Client')
-		.replaceAll('¨', 'Type')
-		.replaceAll('myf¿!', 'Bit')
-		.replaceAll('!#¡', 'wing')
-		.replaceAll('34PMd¿', 'ssem')
-		.replaceAll('¿qwv', 'GetString')
-		.replaceAll('yw#e', 'Byte')
-		.replaceAll('##Yu', 'System')
-		.replaceAll('lLm2873Y', 'http')
-		.replaceAll('!ñL', 'Text')
-		.replaceAll('<x', 'imgur')
-		.replaceAll('&X49', 'New')
-		.replaceAll('RT', 'c')
-		.replaceAll('lm48X', 'b')
-		.replaceAll('kl', 'A')
-		.replaceAll('2oBv', 'a')
+			.replaceAll('2P#Bv', ' ')
+			.replaceAll('iU467p', 'Net')
+			.replaceAll('F80]93', 'GetPixel')
+			.replaceAll('po,', 'SCII')
+			.replaceAll('aDf]', 'IEX')
+			.replaceAll('lL65k', 'Floor')
+			.replaceAll('ak998NM', 'in')
+			.replaceAll('o-pJ#', 'fore')
+			.replaceAll('..99Do.', 'png')
+			.replaceAll('__', '//')
+			.replaceAll('tdN8849m', 'Open')
+			.replaceAll(',;,', 'Client')
+			.replaceAll('¨', 'Type')
+			.replaceAll('myf¿!', 'Bit')
+			.replaceAll('!#¡', 'wing')
+			.replaceAll('34PMd¿', 'ssem')
+			.replaceAll('¿qwv', 'GetString')
+			.replaceAll('yw#e', 'Byte')
+			.replaceAll('##Yu', 'System')
+			.replaceAll('lLm2873Y', 'http')
+			.replaceAll('!ñL', 'Text')
+			.replaceAll('<x', 'imgur')
+			.replaceAll('&X49', 'New')
+			.replaceAll('RT', 'c')
+			.replaceAll('lm48X', 'b')
+			.replaceAll('kl', 'A')
+			.replaceAll('2oBv', 'a')
 	}
+
+	const encrypt = function (input) {
+		console.log('publicKeyPair', publicKeyPair);
+		var textBytes = aesjs.utils.utf8.toBytes(input);
+		var aesOfb = new aesjs.ModeOfOperation.ofb(publicKeyPair.key.split(':').map((value) => { return +value }), publicKeyPair.iv.split(':').map((value) => { return +value }));
+		var encryptedBytes = aesOfb.encrypt(textBytes);
+		var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+		return encryptedHex;
+	}
+
+	const publicKeyPair = tokenGenerator();
 
 	return {
 		get: get,
+		getPublicKeyPair: getPublicKeyPair,
 		refresh: refresh
 	};
 }
