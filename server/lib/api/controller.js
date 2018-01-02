@@ -2,6 +2,7 @@ function API(dependencies) {
 	
 	const _status = require(`${dependencies.root}/lib/routes/backend/status`)(dependencies);
 	const _token = require(`${dependencies.root}/lib/routes/backend/token`)(dependencies);
+	const _webhook = require(`${dependencies.root}/lib/routes/backend/webhook`)(dependencies);
 
 	/// Dependencies
 	const _console = dependencies.console;
@@ -23,10 +24,15 @@ function API(dependencies) {
 		
 		_apiRoutes.get('/Status', _status.get);
 
-		/// Add some many routes
+		/// Token definition
 		_apiRoutes.get('/token/refresh', _token.refresh);
 		_apiRoutes.get('/token/public', _token.getPublicKeyPair);
 		_apiRoutes.get('/token/private', _token.getSignedPrivateKeyPair);
+		_apiRoutes.post('/token/isAllowed', _token.isAllowed);
+
+		/// Webhook definition
+		_apiRoutes.get('/webhook/subscribe/:ip', _webhook.subscribe);
+		_apiRoutes.get('/webhook/post/:message', _webhook.postAction);
 
 		// apply the routes to our application with the prefix /api
 		_app.use('/api', _apiRoutes);

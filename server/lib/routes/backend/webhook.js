@@ -7,7 +7,8 @@ function webhook(dependencies) {
 
 	const subscribe = function (req, res) {
 		if (req.params.ip) {
-			subscribers.push(req.params.ip);
+			subscribers.push({ ip: req.params.ip });
+			_console.success('Server', `${req.params.ip} is subscribed succesfuly`);
 			res.json({ success: true, message: 'IP subscribed succesfuly', data: null });
 		}
 		else {
@@ -16,40 +17,33 @@ function webhook(dependencies) {
 	}
 
 	const postAction = function (req, res) {
-
 		if (subscribers.length > 0) {
 			var result = [];
-			var i = 0;
-			subscribers.forEach(subscriber => {
-				if (i >= subscribers.length) {
-					res.json({ success: true, message: 'Delivery is end', data: result });
-				}
-				else {
-					request({
-						method: 'POST',
-						uri: `http://${subscriber.ip}/post`,
-						multipart: [
-							{
-								'content-type': 'application/json',
-								body: JSON.stringify({
-									foo: 'bar',
 
-								})
-							}
-						]
-					},
-						function (error, response, body) {
-							if (response.statusCode == 200) {
+			for (let i = 0; i < subscribers.length; i++) {
+				const subscriber = subscribers[i];
+
+				request.post(`http://${subscriber.ip}/webhook/${req.params.message}`, {
+					form: {
+						message: req.params.message
+					}
+				},
+					function (error, response, body) {
+						if (error) {
+							res.json({ success: false, message: error, data: null });
+						}
+						else {
+							if (response && response.statusCode == 200) {
 								result.push({ ip: subscriber.ip, delivered: true });
 							}
 							else {
-								result.push({ ip: subscriber.ip, delivered: true })
+								result.push({ ip: subscriber.ip, delivered: false })
 							}
-							i++;
-						});
-				}
+						}
+					});
+			}
 
-			});
+			res.json({ success: true, message: 'Delivery is end', data: result });
 		}
 		else {
 			res.json({ success: false, message: 'Subscribe at least one IP', data: null });
@@ -57,7 +51,8 @@ function webhook(dependencies) {
 	}
 
 	return {
-		subscribe: subscribe
+		subscribe: subscribe,
+		postAction: postAction,
 	}
 }
 

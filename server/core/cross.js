@@ -76,10 +76,13 @@ function Cross(dependencies) {
 		res.render('maintenanceView', null);
 	}
 
-	const randomStringGenerator = function (length, prefix) {
-		// Convert it to base 36 (numbers + letters), and grab the first 9 characters
+	var randomStringGenerator = function (length, prefix) {
+		// Convert it to base 36 (numbers + letters), and grab the first 6 characters
 		// after the decimal.
-		return (prefix == undefined ? 'keyg-' : prefix) + Math.random().toString(36).substr(2, (length == undefined ? 5 : length));
+		return (prefix == undefined ? 'key-' : prefix) +
+			(
+				(Math.random().toString(36).substr(2, (length == undefined ? 5 : length))) + (Math.random().toString(36).substr(2, (length == undefined ? 5 : length)))
+			).substr(0, (length == undefined ? 5 : length));
 	}
 
 	const stringToAscii = function (input) {
@@ -101,7 +104,7 @@ function Cross(dependencies) {
 		PropertyIsValid: propertyIsValid,
 		SendBadRequest: sendBadRequest,
 		randomStringGenerator: randomStringGenerator,
-		stringToAscii:stringToAscii,
+		stringToAscii: stringToAscii,
 	}
 }
 

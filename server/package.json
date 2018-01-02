@@ -32,7 +32,8 @@
 		"jsonwebtoken": "latest",
 		"react": "^16.0.0",
 		"react-dom": "^16.0.0",
-		"request": "^2.83.0"
+		"request": "^2.83.0",
+		"cors": "latest"
 	},
 	"engine": {
 		"node": "6.11.4 || 8.6.x"

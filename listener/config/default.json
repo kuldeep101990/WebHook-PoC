@@ -1,0 +1,8 @@
+{
+	"MainSecretJWT": "NodeJSIsCool",
+	"ServerPort": "3005",
+	"ServerVersion": "0.0.1",
+	"ServerName": "WebHook Listener #1",
+	"apiServerURI": "http://bf80bbec.ngrok.io/api",
+	"listenerURI": "localhost:3005"
+}

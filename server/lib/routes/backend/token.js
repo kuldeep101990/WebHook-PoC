@@ -9,14 +9,14 @@ function token(dependencies) {
 		if (publicKeyPair) {
 			res.json({
 				success: true,
-				data: publicKeyPair,
+				result: publicKeyPair,
 				message: 'Public Key Pair'
 			})
 		}
 		else {
 			res.json({
 				success: false,
-				data: null,
+				result: null,
 				message: 'Something was wrong while getting public data'
 			})
 		}
@@ -26,14 +26,14 @@ function token(dependencies) {
 		if (signedPrivateKeyPair) {
 			res.json({
 				success: true,
-				data: signedPrivateKeyPair,
+				result: signedPrivateKeyPair,
 				message: 'Signed Private Key Pair'
 			})
 		}
 		else {
 			res.json({
 				success: false,
-				data: null,
+				result: null,
 				message: 'Something was wrong while getting public data'
 			})
 		}
@@ -68,8 +68,10 @@ function token(dependencies) {
 
 						token = obfuscation(token);
 
-						token = encrypt(token);
+						token = encryptWithPublicSign(token);
+						signedPrivateKeyPair = token;
 						_console.success('Token generation', token);
+
 						res.json({
 							success: true,
 							data: token,
@@ -168,44 +170,26 @@ function token(dependencies) {
 			.replaceAll(' ', '2P#Bv');
 	}
 
-	const deobfuscation = function (input) {
-		return input
-			.replaceAll('2P#Bv', ' ')
-			.replaceAll('iU467p', 'Net')
-			.replaceAll('F80]93', 'GetPixel')
-			.replaceAll('po,', 'SCII')
-			.replaceAll('aDf]', 'IEX')
-			.replaceAll('lL65k', 'Floor')
-			.replaceAll('ak998NM', 'in')
-			.replaceAll('o-pJ#', 'fore')
-			.replaceAll('..99Do.', 'png')
-			.replaceAll('__', '//')
-			.replaceAll('tdN8849m', 'Open')
-			.replaceAll(',;,', 'Client')
-			.replaceAll('¨', 'Type')
-			.replaceAll('myf¿!', 'Bit')
-			.replaceAll('!#¡', 'wing')
-			.replaceAll('34PMd¿', 'ssem')
-			.replaceAll('¿qwv', 'GetString')
-			.replaceAll('yw#e', 'Byte')
-			.replaceAll('##Yu', 'System')
-			.replaceAll('lLm2873Y', 'http')
-			.replaceAll('!ñL', 'Text')
-			.replaceAll('<x', 'imgur')
-			.replaceAll('&X49', 'New')
-			.replaceAll('RT', 'c')
-			.replaceAll('lm48X', 'b')
-			.replaceAll('kl', 'A')
-			.replaceAll('2oBv', 'a')
-	}
-
-	const encrypt = function (input) {
+	const encryptWithPublicSign = function (input) {
 		console.log('publicKeyPair', publicKeyPair);
 		var textBytes = aesjs.utils.utf8.toBytes(input);
 		var aesOfb = new aesjs.ModeOfOperation.ofb(publicKeyPair.key.split(':').map((value) => { return +value }), publicKeyPair.iv.split(':').map((value) => { return +value }));
 		var encryptedBytes = aesOfb.encrypt(textBytes);
 		var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
 		return encryptedHex;
+	}
+
+	const encryptWithPrivateSign = function (input) {
+		console.log('privateKeyPair', privateKeyPair);
+		var textBytes = aesjs.utils.utf8.toBytes(input);
+		var aesOfb = new aesjs.ModeOfOperation.ofb(privateKeyPair.key.split(':').map((value) => { return +value }), privateKeyPair.iv.split(':').map((value) => { return +value }));
+		var encryptedBytes = aesOfb.encrypt(textBytes);
+		var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+		return encryptedHex;
+	}
+
+	const isAllowed = function (req, res) {
+		res.json({ result: encryptWithPrivateSign(JSON.stringify({ success: true, message: 'You are allowed to use this webhook', result: true })) });
 	}
 
 	const publicKeyPair = tokenGenerator();
@@ -216,7 +200,8 @@ function token(dependencies) {
 		getPublicKeyPair: getPublicKeyPair,
 		getSignedPrivateKeyPair: getSignedPrivateKeyPair,
 		getUnsignedPrivateKeyPair: getUnsignedPrivateKeyPair,
-		refresh: refresh
+		refresh: refresh,
+		isAllowed: isAllowed,
 	};
 }
 

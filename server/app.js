@@ -19,6 +19,7 @@ const spawn = require("child_process").spawn;
 const imgur = require("imgur");
 const aesjs = require('aes-js');
 const request = require('request');
+const cors = require('cors');
 
 console.log(` Server:  ${config.ServerName}`);
 console.log(` version: ${config.ServerVersion}`);
@@ -60,6 +61,7 @@ console.log(dependencies.colors.green(" Server: ") + "Libs imported");
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(bodyParser.json()); // support json encoded bodies
+app.use(cors());
 
 /**
  * Initialize all app
@@ -70,11 +72,7 @@ mainServer.Initialize(() => {
 	/**
 	 * Launching server
 	 */
-	console.log(
-		`${dependencies.colors.cyan(" Server: ")}http://localhost:${
-		dependencies.config.ServerPort
-		}`
-	);
+	console.log(`${dependencies.colors.cyan(" Server: ")}http://localhost:${dependencies.config.ServerPort}`);
 });
 
 /**
