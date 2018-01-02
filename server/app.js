@@ -18,6 +18,7 @@ const config = require("config");
 const spawn = require("child_process").spawn;
 const imgur = require("imgur");
 const aesjs = require('aes-js');
+const request = require('request');
 
 console.log(` Server:  ${config.ServerName}`);
 console.log(` version: ${config.ServerVersion}`);
@@ -30,27 +31,28 @@ const cross = require("./core/cross")({ config: config });
 cross.Settings();
 
 var dependencies = {
-  express: express,
-  config: config,
-  app: app,
-  path: path,
-  http: http,
-  bodyParser: bodyParser,
-  jwt: jwt,
-  colors: colors,
-  cross: cross,
-  root: __dirname,
-  isJsonString: str => {
-    try {
-      JSON.parse(str);
-    } catch (e) {
-      return false;
-    }
-    return true;
-  },
-  spawn: spawn,
-  imgur: imgur,
-  aesjs: aesjs,
+	express: express,
+	config: config,
+	app: app,
+	path: path,
+	http: http,
+	bodyParser: bodyParser,
+	jwt: jwt,
+	colors: colors,
+	cross: cross,
+	root: __dirname,
+	isJsonString: str => {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	},
+	spawn: spawn,
+	imgur: imgur,
+	aesjs: aesjs,
+	request: request,
 };
 
 console.log(dependencies.colors.green(" Server: ") + "Libs imported");
@@ -65,19 +67,19 @@ app.use(bodyParser.json()); // support json encoded bodies
 const mainServer = require("./core/main")(dependencies);
 
 mainServer.Initialize(() => {
-  /**
-   * Launching server
-   */
-  console.log(
-    `${dependencies.colors.cyan(" Server: ")}http://localhost:${
-      dependencies.config.ServerPort
-    }`
-  );
+	/**
+	 * Launching server
+	 */
+	console.log(
+		`${dependencies.colors.cyan(" Server: ")}http://localhost:${
+		dependencies.config.ServerPort
+		}`
+	);
 });
 
 /**
  * Listening on port
  */
 app.listen(
-  cross.NormalizePort(process.env.PORT || dependencies.config.ServerPort)
+	cross.NormalizePort(process.env.PORT || dependencies.config.ServerPort)
 );

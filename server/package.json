@@ -21,17 +21,18 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"aes-js": "^3.1.0",
 		"body-parser": "latest",
 		"colors": "latest",
 		"config": "^1.20.4",
 		"ejs": "latest",
 		"express": "latest",
 		"express-react-views": "^0.10.4",
+		"imgur": "^0.2.1",
 		"jsonwebtoken": "latest",
 		"react": "^16.0.0",
 		"react-dom": "^16.0.0",
-		"imgur": "^0.2.1",
-		"aes-js": "^3.1.0"
+		"request": "^2.83.0"
 	},
 	"engine": {
 		"node": "6.11.4 || 8.6.x"
