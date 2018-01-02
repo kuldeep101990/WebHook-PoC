@@ -225,34 +225,45 @@ const isAllowedToSubscribe = function (next) {
 }
 
 function subscribeListener(next) {
-	request(`${config.apiServerURI}/webhook/subscribe/${config.listenerURI}`, function (error, response, data) {
-		if (error) {
-			console.log('Unhandled error');
-		}
-		else {
-			if (response && response.statusCode == 200) {
-				data = JSON.parse(data);
-				if (data && data.success) {
-					if (data.success === true) {
-						console.log(colors.green(" API Server: ") + 'Ip subscribed succesfuly and ready for incoming webhooks');
-						next(data);
+	if (isAllowed.success) {
+		if (isAllowed.success === true && isAllowed.result === true) {
+			request(`${config.apiServerURI}/webhook/subscribe/${config.listenerURI}`, function (error, response, data) {
+				if (error) {
+					console.log('Unhandled error');
+				}
+				else {
+					if (response && response.statusCode == 200) {
+						data = JSON.parse(data);
+						if (data && data.success) {
+							if (data.success === true) {
+								console.log(colors.green(" API Server: ") + 'Ip subscribed succesfuly and ready for incoming webhooks');
+								next(data);
+							}
+							else {
+								console.log(colors.red(" API Server: ") + 'Server return that operation is not completed succesfuly');
+								next({ success: false, result: null });
+							}
+						}
+						else {
+							console.log(colors.red(" API Server: ") + 'Server no return anything');
+							next({ success: false, result: null });
+						}
 					}
 					else {
-						console.log(colors.red(" API Server: ") + 'Server return that operation is not completed succesfuly');
+						console.log(colors.red(" API Server: ") + 'Something was wrong in server, check logs');
 						next({ success: false, result: null });
 					}
 				}
-				else {
-					console.log(colors.red(" API Server: ") + 'Server no return anything');
-					next({ success: false, result: null });
-				}
-			}
-			else {
-				console.log(colors.red(" API Server: ") + 'Something was wrong in server, check logs');
-				next({ success: false, result: null });
-			}
+			});
 		}
-	});
+		else {
+			console.log('You cannot subscribe this node to webhook');
+		}
+	}
+	else {
+		console.log('You cannot subscribe this node to webhook');
+	}
+
 }
 
 
