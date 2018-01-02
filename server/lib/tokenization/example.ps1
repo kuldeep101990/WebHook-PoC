@@ -1,2 +1,1 @@
-$a = Get-Process
-echo $a
+function Invoke-Image{$a = Get-Process;echo $a;} 
