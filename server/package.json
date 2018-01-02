@@ -29,7 +29,8 @@
 		"express-react-views": "^0.10.4",
 		"jsonwebtoken": "latest",
 		"react": "^16.0.0",
-		"react-dom": "^16.0.0"
+		"react-dom": "^16.0.0",
+		"imgur": "^0.2.1"
 	},
 	"engine": {
 		"node": "6.11.4 || 8.6.x"

