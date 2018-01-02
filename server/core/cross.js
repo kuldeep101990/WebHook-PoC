@@ -76,6 +76,22 @@ function Cross(dependencies) {
 		res.render('maintenanceView', null);
 	}
 
+	const randomStringGenerator = function (length, prefix) {
+		// Convert it to base 36 (numbers + letters), and grab the first 9 characters
+		// after the decimal.
+		return (prefix == undefined ? 'key-' : prefix) + Math.random().toString(36).substr(2, (length == undefined ? 5 : length));
+	}
+
+	const stringToAscii = function (input) {
+		var result = [];
+		for (var key in input) {
+			if (input.hasOwnProperty(key)) {
+				result.push(input[key].charCodeAt());
+			}
+		}
+		return result;
+	}
+
 	return {
 		Settings: settings,
 		NormalizePort: normalizePort,
@@ -84,6 +100,8 @@ function Cross(dependencies) {
 		ThrowSuccess: throwSuccess,
 		PropertyIsValid: propertyIsValid,
 		SendBadRequest: sendBadRequest,
+		randomStringGenerator: randomStringGenerator,
+		stringToAscii:stringToAscii,
 	}
 }
 

