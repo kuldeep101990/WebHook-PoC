@@ -1,6 +1,7 @@
 function API(dependencies) {
 	
 	const _status = require(`${dependencies.root}/lib/routes/backend/status`)(dependencies);
+	const _token = require(`${dependencies.root}/lib/routes/backend/token`)(dependencies);
 
 	/// Dependencies
 	const _console = dependencies.console;
@@ -23,8 +24,7 @@ function API(dependencies) {
 		_apiRoutes.get('/Status', _status.get);
 
 		/// Add some many routes
-		/* _apiRoutes.post('/Video/Create', _video.createVideo);
-		_apiRoutes.get('/Videos/Newest', _video.getAllNewestVideos); */
+		_apiRoutes.get('/token/refresh', _token.refresh);
 
 		// apply the routes to our application with the prefix /api
 		_app.use('/api', _apiRoutes);

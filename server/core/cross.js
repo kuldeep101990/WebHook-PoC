@@ -1,4 +1,15 @@
 function Cross(dependencies) {
+	const settings = () => {
+		String.prototype.replaceAll = function (search, replacement) {
+			var target = this;
+			return target.replace(new RegExp(search, 'g'), replacement);
+		};
+
+		String.prototype.capitalize = function () {
+			return this.replace(/\b\w/g, l => l.toUpperCase());
+		}
+	}
+
 	const normalizePort = (val) => {
 		var port = parseInt(val, 10);
 
@@ -66,6 +77,7 @@ function Cross(dependencies) {
 	}
 
 	return {
+		Settings: settings,
 		NormalizePort: normalizePort,
 		IDGenerator: idGenerator,
 		ThrowError: throwError,
