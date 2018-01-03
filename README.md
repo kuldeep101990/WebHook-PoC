@@ -66,3 +66,12 @@ Finally, when both parties are ready with their corresponding keys the client ne
 3) Listener receive their message and try to decrypt information
 4) If decrypted message correspond to know message show a succesful message and related action in console (do some action)
 5) If decrypted message is corrupted close server.
+
+## To do
+* Implement an authentication method to get public key
+* Modify Invoke-PSImage to save a json file and not another PS1 file
+* Remove callback use
+* Clean code in listener
+* Auto-refresh semi-public token
+* Deprecate fixed obfuscation code and develop more random code
+* Do more actions to listen webhooks (only accept 'Hello' message)
