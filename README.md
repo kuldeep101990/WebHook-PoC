@@ -56,7 +56,7 @@ Finally, when both parties are ready with their corresponding keys the client ne
 2) API Server receive request and response an encrypted message with private key
 3) Client receive encrypted key and try to decrypt message
 4) Client read decrypted message
-5) If data isn't corrupt request to API Server to subscribe IP
+5) If data isn't corrupt, request to API Server to subscribe IP
 6) API Server receive the request and save their IP and encrypt it.
 7) Client is ready to listen webhooks
 
